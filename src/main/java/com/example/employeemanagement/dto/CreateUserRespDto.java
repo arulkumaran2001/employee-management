@@ -5,9 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.UUID;
+
 @Data
 public class CreateUserRespDto {
-    private Long id;
+    private UUID id;
     private String username;
     private Role role;
     private String email;

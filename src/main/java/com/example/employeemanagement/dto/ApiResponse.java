@@ -4,13 +4,13 @@ public class ApiResponse<T> {
     private boolean success;
     private String message;
     private T data;
-    private Object error;
+    private ApiError error;
 
 
     public ApiResponse() {
     }
 
-    public ApiResponse(boolean success, String message, T data, Object error) {
+    public ApiResponse(boolean success, String message, T data, ApiError error) {
         this.success = success;
         this.message = message;
         this.data = data;
@@ -45,7 +45,7 @@ public class ApiResponse<T> {
         return error;
     }
 
-    public void setError(Object error) {
+    public void setError(ApiError error) {
         this.error = error;
     }
 }
