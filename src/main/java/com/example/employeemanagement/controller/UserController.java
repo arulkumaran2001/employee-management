@@ -1,5 +1,6 @@
 package com.example.employeemanagement.controller;
 
+import com.example.employeemanagement.dto.ApiResponse;
 import com.example.employeemanagement.dto.CreateUserRequestDto;
 import com.example.employeemanagement.dto.CreateUserRespDto;
 import com.example.employeemanagement.entity.User;
@@ -29,25 +30,21 @@ public class UserController {
     }
 
     @PostMapping("user")
-    public ResponseEntity<CreateUserRespDto> createUser(@RequestBody CreateUserRequestDto request) {
-        // Logic to create a user
-        CreateUserRespDto response = userService.createUser(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<User>> createUser(@RequestBody CreateUserRequestDto request) {
+        return userService.createUser(request);
     }
     @GetMapping("{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserdetail(id));
+    public ResponseEntity<ApiResponse<User>> getUser(@PathVariable Long id) {
+        return userService.getUserdetail(id);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        String message = userService.deleteUser(id);
-         return new ResponseEntity<>(message, HttpStatus.OK);
+    public ResponseEntity<ApiResponse<User>> deleteUser(@PathVariable Long id) {
+         return userService.deleteUser(id);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<String> updateUser(@PathVariable long id,@RequestBody CreateUserRequestDto requestDto){
-        String message = userService.updateUser(id,requestDto);
-        return new ResponseEntity<>(message,HttpStatus.OK);
+    public ResponseEntity<ApiResponse<User>> updateUser(@PathVariable long id,@RequestBody CreateUserRequestDto request){
+        return userService.updateUser(id,request);
     }
 }

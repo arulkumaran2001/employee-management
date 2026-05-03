@@ -1,53 +1,45 @@
 package com.example.employeemanagement.service;
 
+import com.example.employeemanagement.dto.ApiResponse;
 import com.example.employeemanagement.dto.CreateUserRequestDto;
 import com.example.employeemanagement.dto.CreateUserRespDto;
 import com.example.employeemanagement.entity.User;
+import com.example.employeemanagement.exception.ResourceNotFoundException;
+import com.example.employeemanagement.mapper.UserServiceMapper;
 import com.example.employeemanagement.repository.UserRepository;
+import jakarta.persistence.Id;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import static org.springframework.http.ResponseEntity.ok;
 
 @Service
 public class UserService {
     @Autowired
     UserRepository userRepository;
+    UserServiceMapper userServiceMapper;
 
-    public CreateUserRespDto createUser(CreateUserRequestDto request) {
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setRole(request.getRole());
-        user.setEmail(request.getEmail());
-        user.setSalary(request.getSalary());
-        user.setJoiningDate(LocalDate.now());
-
-        User savedUser = userRepository.save(user);
-        CreateUserRespDto response=new CreateUserRespDto();
-        response.setId(savedUser.getId());
-        response.setUsername(savedUser.getUsername());
-        response.setRole(savedUser.getRole());
-        response.setEmail(savedUser.getEmail());
-        response.setSalary(savedUser.getSalary());
-        response.setJoiningDate(savedUser.getJoiningDate());
-        return response;
-    }
-    public User getUserdetail(Long Id){
-        User user=userRepository.findById(Id).orElseThrow(()->new RuntimeException("User not found with id: "+Id));
-        return user;
-    }
-    public String deleteUser(Long Id){
-        userRepository.delete(userRepository.findById(Id).orElseThrow(()->new RuntimeException("User not found with id: "+Id)));
-        return String.format("User with id %d deleted successfully",Id);
+    public ResponseEntity<ApiResponse<User>> createUser(CreateUserRequestDto request) {
+        User user=userServiceMapper.mapToEntity(request);
+        User createdUser = userRepository.save(user);
+        return userServiceMapper.mapToApiResponse(createdUser, "User created successfully", HttpStatus.CREATED);
     }
 
-    public String updateUser(long id,CreateUserRequestDto requestDto) {
-        User updateUser=userRepository.findById(id).orElseThrow(()->new RuntimeException("User not found with id: "+id));
-        updateUser.setUsername(requestDto.getUsername());
-        updateUser.setRole(requestDto.getRole());
-        updateUser.setEmail(requestDto.getEmail());
-        updateUser.setSalary(requestDto.getSalary());
-        userRepository.save(updateUser);
-        return String.format("User with id %d updated successfully",id);
+    public ResponseEntity<ApiResponse<User>> getUserdetail(Long id){
+        User user=userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User not found with id: "+id));
+        return userServiceMapper.mapToApiResponse(user, "User retrieved successfully", HttpStatus.OK);
+    }
+
+    public ResponseEntity<ApiResponse<User>> deleteUser(Long id){
+        userRepository.delete(userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User not found with id: "+id)));
+        return userServiceMapper.mapToApiResponse(null, "User deleted successfully", HttpStatus.NO_CONTENT);
+    }
+    public ResponseEntity<ApiResponse<User>> updateUser(long id,CreateUserRequestDto request) {
+        userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User not found with id: "+ id));
+        User user=userServiceMapper.mapToEntity(request);
+        User updatedUser = userRepository.save(user);
+        return userServiceMapper.mapToApiResponse(updatedUser, "User updated successfully", HttpStatus.OK);
     }
 }

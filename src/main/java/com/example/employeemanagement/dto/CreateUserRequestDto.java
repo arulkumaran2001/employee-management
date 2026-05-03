@@ -1,5 +1,8 @@
 package com.example.employeemanagement.dto;
 
+import com.example.employeemanagement.entity.Role;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,8 +15,9 @@ public class CreateUserRequestDto {
     @NotBlank(message = "Name is required")
     private String username;
 
+    @Enumerated(EnumType.STRING)
     @NotBlank(message = "role is required")
-    private String role;
+    private Role role;
 
     @NotBlank(message = "email is required")
     private String email;
