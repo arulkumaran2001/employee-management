@@ -4,11 +4,15 @@ import com.example.employeemanagement.dto.ApiResponse;
 import com.example.employeemanagement.dto.CreateUserRequestDto;
 import com.example.employeemanagement.dto.CreateUserRespDto;
 import com.example.employeemanagement.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
+@Component
 public class UserServiceMapper {
 
     public User mapToEntity(CreateUserRequestDto request) {

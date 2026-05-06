@@ -23,13 +23,13 @@ public class UserController {
     UserRepository userRepository;
 
 
-    @GetMapping("users")
+    @GetMapping("/users")
     public List<User> getAllUsers() {
         // Logic to get all users
         return userRepository.findAll();
     }
 
-    @PostMapping("user")
+    @PostMapping("/user")
     public ResponseEntity<ApiResponse<User>> createUser(@RequestBody CreateUserRequestDto request) {
         return userService.createUser(request);
     }

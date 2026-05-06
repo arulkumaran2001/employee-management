@@ -8,6 +8,7 @@ import com.example.employeemanagement.exception.ResourceNotFoundException;
 import com.example.employeemanagement.mapper.UserServiceMapper;
 import com.example.employeemanagement.repository.UserRepository;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,12 @@ import org.springframework.stereotype.Service;
 import static org.springframework.http.ResponseEntity.ok;
 
 @Service
+@AllArgsConstructor
 public class UserService {
-    @Autowired
-    UserRepository userRepository;
-    UserServiceMapper userServiceMapper;
+
+    private final  UserRepository userRepository;
+    private final UserServiceMapper userServiceMapper;
+
 
     public ResponseEntity<ApiResponse<User>> createUser(CreateUserRequestDto request) {
         User user=userServiceMapper.mapToEntity(request);
