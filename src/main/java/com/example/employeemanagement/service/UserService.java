@@ -13,12 +13,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 import static org.springframework.http.ResponseEntity.ok;
 
 @Service
 public class UserService {
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
     UserServiceMapper userServiceMapper;
 
     public ResponseEntity<ApiResponse<User>> createUser(CreateUserRequestDto request) {
@@ -27,16 +31,16 @@ public class UserService {
         return userServiceMapper.mapToApiResponse(createdUser, "User created successfully", HttpStatus.CREATED);
     }
 
-    public ResponseEntity<ApiResponse<User>> getUserdetail(Long id){
+    public ResponseEntity<ApiResponse<User>> getUserdetail(UUID id){
         User user=userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User not found with id: "+id));
         return userServiceMapper.mapToApiResponse(user, "User retrieved successfully", HttpStatus.OK);
     }
 
-    public ResponseEntity<ApiResponse<User>> deleteUser(Long id){
+    public ResponseEntity<ApiResponse<User>> deleteUser(UUID id){
         userRepository.delete(userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User not found with id: "+id)));
         return userServiceMapper.mapToApiResponse(null, "User deleted successfully", HttpStatus.NO_CONTENT);
     }
-    public ResponseEntity<ApiResponse<User>> updateUser(long id,CreateUserRequestDto request) {
+    public ResponseEntity<ApiResponse<User>> updateUser(UUID id,CreateUserRequestDto request) {
         userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User not found with id: "+ id));
         User user=userServiceMapper.mapToEntity(request);
         User updatedUser = userRepository.save(user);
