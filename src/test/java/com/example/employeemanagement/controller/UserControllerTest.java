@@ -1,38 +1,102 @@
 package com.example.employeemanagement.controller;
 
-import org.junit.jupiter.api.AfterEach;
+import com.example.employeemanagement.dto.ApiResponse;
+import com.example.employeemanagement.dto.CreateUserRequestDto;
+import com.example.employeemanagement.entity.Role;
+import com.example.employeemanagement.entity.User;
+import com.example.employeemanagement.service.UserService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.time.LocalDate;
+import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
+@WebMvcTest(UserController.class)
 class UserControllerTest {
 
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private UserService userService;
+
+    private ObjectMapper objectMapper;
+
     @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
-
-    @Test
-    void getAllUsers() {
+    void setup() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Test
-    void createUser() {
-    }
+    void testCreateUser_success() throws Exception {
 
-    @Test
-    void getUser() {
-    }
+        // Request
+        CreateUserRequestDto request = new CreateUserRequestDto(
+                "Hari",
+                Role.ADMIN,
+                "hari@gmail.com",
+                50000.0,
+                LocalDate.now()
+        );
 
-    @Test
-    void deleteUser() {
-    }
+        // Mock response
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        user.setUsername("Hari");
+        user.setRole(Role.ADMIN);
+        user.setEmail("hari@gmail.com");
+        user.setSalary(50000.0);
+        user.setJoiningDate(LocalDate.now());
 
-    @Test
-    void updateUser() {
+        ApiResponse<User> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
+        apiResponse.setMessage("User created successfully");
+        apiResponse.setData(user);
+
+        ResponseEntity<ApiResponse<User>> responseEntity =
+                new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
+
+        Mockito.when(userService.createUser(Mockito.any()))
+                .thenReturn(responseEntity);
+
+        // Perform API call
+        MvcResult result = mockMvc.perform(post("/api/v1/user")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andReturn();
+
+        // ✅ Assert HTTP Status
+        assertEquals(201, result.getResponse().getStatus());
+
+        // ✅ Convert response JSON to Object
+        String json = result.getResponse().getContentAsString();
+
+        ApiResponse<User> actualResponse = objectMapper.readValue(
+                json,
+                new TypeReference<ApiResponse<User>>() {}
+        );
+
+        // ✅ Assertions
+        assertEquals(true, actualResponse.isSuccess());
+        assertEquals("User created successfully", actualResponse.getMessage());
+        assertEquals("Hari", actualResponse.getData().getUsername());
+        assertEquals("hari@gmail.com", actualResponse.getData().getEmail());
     }
 }
