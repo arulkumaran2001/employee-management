@@ -20,15 +20,14 @@ public class UserController {
     @Autowired
     UserService userService;
     
-    @Autowired
-    UserRepository userRepository;
-
-
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
-        // Logic to get all users
-        return userRepository.findAll();
-    }
+//    @Autowired
+//    UserRepository userRepository;
+//
+//
+//    @GetMapping("/users")
+//    public List<User> getAllUsers() {
+//        return userRepository.findAll();
+//    }
 
     @PostMapping("/user")
     public ResponseEntity<ApiResponse<User>> createUser(@RequestBody CreateUserRequestDto request) {
