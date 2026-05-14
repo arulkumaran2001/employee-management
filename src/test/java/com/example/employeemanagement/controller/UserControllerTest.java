@@ -21,7 +21,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(UserController.class)
 class UserControllerTest {
@@ -81,8 +82,12 @@ class UserControllerTest {
         assertEquals("hari@gmail.com", actualResponse.getData().getEmail());
     }
 
+
     @Test
     void testUpdateUser_success() throws Exception {
+
+        UUID id = UUID.randomUUID();
+
         CreateUserRequestDto request = new CreateUserRequestDto(
                 "Hari",
                 Role.ADMIN,
@@ -91,9 +96,46 @@ class UserControllerTest {
                 LocalDate.now()
         );
 
-        MvcResult result = mockMvc.perform(post("/api/v1/{id}")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(request)))
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        user.setUsername("Hari");
+        user.setRole(Role.ADMIN);
+        user.setEmail("hari@gmail.com");
+        user.setSalary(50000.0);
+        user.setJoiningDate(LocalDate.now());
+
+        ApiResponse<User> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
+        apiResponse.setMessage("User updated successfully");
+        apiResponse.setData(user);
+
+        ResponseEntity<ApiResponse<User>> responseEntity =
+                new ResponseEntity<>(apiResponse, HttpStatus.OK);
+
+        // ✅ IMPORTANT: use matchers for ALL params
+        Mockito.when(userService.updateUser(Mockito.eq(id), Mockito.any()))
+                .thenReturn(responseEntity);
+
+        MvcResult result = mockMvc.perform(
+                        put("/api/v1/{id}", id)
+                                .contentType("application/json")
+                                .content(objectMapper.writeValueAsString(request)))
                 .andReturn();
+
+        // ✅ Status
+        assertEquals(200, result.getResponse().getStatus());
+
+        String json = result.getResponse().getContentAsString();
+
+        ApiResponse<User> actualResponse = objectMapper.readValue(
+                json,
+                new TypeReference<ApiResponse<User>>() {}
+        );
+
+        // ✅ Assertions
+        assertTrue(actualResponse.isSuccess());
+        assertEquals("User updated successfully", actualResponse.getMessage());
+        assertEquals("Hari", actualResponse.getData().getUsername());
+        assertEquals("hari@gmail.com", actualResponse.getData().getEmail());
     }
 }
