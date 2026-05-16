@@ -4,6 +4,7 @@ import com.example.employeemanagement.entity.Role;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -16,13 +17,13 @@ public class CreateUserRequestDto {
     private String username;
 
     @Enumerated(EnumType.STRING)
-    @NotBlank(message = "role is required")
+    @NotNull(message = "role is required")
     private Role role;
 
     @NotBlank(message = "email is required")
     private String email;
 
-    @NotBlank(message = "salary is required")
+    @NotNull(message = "salary is required")
     private Double salary;
 
 

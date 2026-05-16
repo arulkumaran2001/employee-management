@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.ResponseEntity.ok;
@@ -24,6 +25,11 @@ public class UserService {
 
     @Autowired
     UserServiceMapper userServiceMapper;
+
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 
     public ResponseEntity<ApiResponse<User>> createUser(CreateUserRequestDto request) {
         User user=userServiceMapper.mapToEntity(request);

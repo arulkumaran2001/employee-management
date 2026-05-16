@@ -19,15 +19,11 @@ import java.util.UUID;
 public class UserController {
     @Autowired
     UserService userService;
-    
-//    @Autowired
-//    UserRepository userRepository;
-//
-//
-//    @GetMapping("/users")
-//    public List<User> getAllUsers() {
-//        return userRepository.findAll();
-//    }
+
+    @GetMapping("/users")
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
+    }
 
     @PostMapping("/user")
     public ResponseEntity<ApiResponse<User>> createUser(@RequestBody CreateUserRequestDto request) {

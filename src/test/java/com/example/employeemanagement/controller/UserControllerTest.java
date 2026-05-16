@@ -37,6 +37,14 @@ class UserControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
     }
     @Test
+    void testGetAllUsers_success() throws Exception {
+        MvcResult result = mockMvc.perform(get("/api/v1/users")
+                        .contentType("application/json"))
+                .andReturn();
+        assertEquals(200, result.getResponse().getStatus());
+    }
+
+    @Test
     void testCreateUser_success() throws Exception {
 // Request
         CreateUserRequestDto request = new CreateUserRequestDto(
@@ -54,10 +62,12 @@ class UserControllerTest {
         user.setEmail("hari@gmail.com");
         user.setSalary(50000.0);
         user.setJoiningDate(LocalDate.now());
+
         ApiResponse<User> apiResponse = new ApiResponse<>();
         apiResponse.setSuccess(true);
         apiResponse.setMessage("User created successfully");
         apiResponse.setData(user);
+
         ResponseEntity<ApiResponse<User>> responseEntity =
                 new ResponseEntity<>(apiResponse, HttpStatus.CREATED);
         Mockito.when(userService.createUser(Mockito.any()))
@@ -82,6 +92,38 @@ class UserControllerTest {
         assertEquals("hari@gmail.com", actualResponse.getData().getEmail());
     }
 
+    @Test
+    void testGetUser_success() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        user.setUsername("Hari");
+        user.setRole(Role.ADMIN);
+        user.setEmail("hari@gmail.com");
+        user.setSalary(50000.0);
+        user.setJoiningDate(LocalDate.now());
+
+        ApiResponse<User> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
+        apiResponse.setMessage("User retrieved successfully");
+        apiResponse.setData(user);
+
+        ResponseEntity<ApiResponse<User>> responseEntity =
+                new ResponseEntity<>(apiResponse, HttpStatus.OK);
+
+//        Mockito.when(userService.updateUser(Mockito.eq(id), Mockito.any()))
+//                .thenReturn(responseEntity);
+
+        Mockito.when(userService.getUserdetail(Mockito.eq(id)))
+                .thenReturn(responseEntity);
+
+        MvcResult result= mockMvc.perform(get("/api/v1/{id}",id)
+                .contentType("application/json"))
+        .andReturn();
+
+        assertEquals(200,result.getResponse().getStatus());
+    }
 
     @Test
     void testUpdateUser_success() throws Exception {
@@ -137,5 +179,27 @@ class UserControllerTest {
         assertEquals("User updated successfully", actualResponse.getMessage());
         assertEquals("Hari", actualResponse.getData().getUsername());
         assertEquals("hari@gmail.com", actualResponse.getData().getEmail());
+    }
+
+    @Test
+    void testDeleteUser_success() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        ApiResponse<User> apiResponse = new ApiResponse<>();
+        apiResponse.setSuccess(true);
+        apiResponse.setMessage("User deleted successfully");
+        apiResponse.setData(null);
+
+        ResponseEntity<ApiResponse<User>> responseEntity =
+                new ResponseEntity<>(apiResponse, HttpStatus.NO_CONTENT);
+
+        Mockito.when(userService.deleteUser(Mockito.eq(id)))
+                .thenReturn(responseEntity);
+
+        MvcResult result = mockMvc.perform(delete("/api/v1/{id}", id)
+                        .contentType("application/json"))
+                .andReturn();
+
+        assertEquals(204, result.getResponse().getStatus());
     }
 }
